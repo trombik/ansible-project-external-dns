@@ -1,0 +1,13 @@
+---
+
+- name: trombik.hostname
+- name: trombik.hosts
+- name: trombik.sudo
+- name: trombik.zsh
+- name: trombik.vim
+- name: trombik.tmux
+- name: trombik.apt_repo
+- name: trombik.redhat_repo
+- name: trombik.git
+- name: trombik.x509_certificate
+- name: trombik.nsd

@@ -1,0 +1,17 @@
+---
+all:
+  hosts:
+    ns.trombik.org:
+      vagrant_priority: 11
+      ansible_host: 172.16.100.200
+      vagrant_box: trombik/test-openbsd-6.6-amd64
+  children:
+    ns:
+      hosts:
+        ns.trombik.org:
+    virtualbox_credentials:
+      children:
+        ns:
+    virtualbox:
+      children:
+        ns:

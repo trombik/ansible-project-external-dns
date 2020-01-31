@@ -1,0 +1,73 @@
+---
+
+# ____________________________________________________nsd
+nsd_flags: ""
+nsd_zones: "{{ project_nsd_zones }}"
+os_nsd_extra_packages:
+  FreeBSD: []
+  Debian: ["dnsutils"]
+  OpenBSD: []
+  RedHat: ["bind-utils"]
+nsd_extra_packages: "{{ os_nsd_extra_packages[ansible_os_family] }}"
+nsd_extra_groups: []
+nsd_config: |
+  server:
+    server-count: 2
+    do-ip4: yes
+    do-ip6: no
+    verbosity: 1
+    username: "{{ nsd_user }}"
+    zonesdir: "{{ nsd_zonesdir }}"
+    database: ""
+    hide-version: yes
+    pidfile: "{{ nsd_pid_file }}"
+  remote-control:
+    {% if ansible_os_family == 'OpenBSD' %}
+    control-enable: yes
+    {% else %}
+    control-enable: no
+    {% endif %}
+    control-interface: 127.0.0.1
+    control-port: 8952
+  {% for zone in nsd_zones %}
+  zone:
+    name: "{{ zone.name }}"
+    zonefile: "{{ nsd_config_dir }}/{{ zone.name }}"
+    {{ zone.zone_config }}
+  {% endfor %}
+
+# ____________________________________________________x509_certificate
+nsd_include_x509_certificate: yes
+x509_certificate_debug_log: "{{ project_x509_certificate_debug_log }}"
+x509_certificate:
+  - name: nsd_server
+    state: present
+    secret:
+      path: "{{ nsd_config_dir }}/nsd_server.key"
+      owner: "{{ nsd_user }}"
+      group: "{{ nsd_group }}"
+      mode: "0640"
+      key: "{{ project_nsd_server_key }}"
+    public:
+      path: "{{ nsd_config_dir }}/nsd_server.pem"
+      key: "{{ project_nsd_server_pem }}"
+  - name: nsd_control
+    state: present
+    secret:
+      path: "{{ nsd_config_dir }}/nsd_control.key"
+      owner: "{{ nsd_user }}"
+      group: "{{ nsd_group }}"
+      mode: "0640"
+      key: "{{ project_nsd_control_key }}"
+    public:
+      path: "{{ nsd_config_dir }}/nsd_control.pem"
+      key: "{{ project_nsd_control_pem }}"
+
+# ____________________________________________________redhat_repo
+redhat_repo_extra_packages:
+  - epel-release
+redhat_repo:
+  epel:
+    mirrorlist: "http://mirrors.fedoraproject.org/mirrorlist?repo=epel-{{ ansible_distribution_major_version }}&arch={{ ansible_architecture }}"
+    gpgcheck: yes
+    enabled: yes
