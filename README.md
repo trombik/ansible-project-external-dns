@@ -1,1 +1,1 @@
-# `ansible` project for `ns.trombik.oeg`
+# `ansible` project for `ns.trombik.org`
