@@ -1,0 +1,74 @@
+---
+# tasks file for ansible-role-redhat_repo
+
+- name: Install extra packages
+  yum:
+    name: "{{ redhat_repo_extra_packages }}"
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Install repositories
+  yum_repository:
+    async: "{{ item.value.async | default(omit) }}"
+    attributes: "{{ item.value.attributes | default(omit) }}"
+    bandwidth: "{{ item.value.bandwidth | default(omit) }}"
+    baseurl: "{{ item.value.baseurl | default(omit) }}"
+    cost: "{{ item.value.cost | default(omit) }}"
+    deltarpm_metadata_percentage: "{{ item.value.deltarpm_metadata_percentage | default(omit) }}"
+    deltarpm_percentage: "{{ deltarpm_percentage | default(omit) }}"
+    description: "{% if 'description' in item.value %}{{ item.value.description }}{% else %}{{ item.key }} repository{% endif %}"
+    enabled: "{{ item.value.enabled | default(omit) }}"
+    enablegroups: "{{ item.value.enablegroups | default(omit) }}"
+    exclude: "{{ item.value.exclude | default(omit) }}"
+    failovermethod: "{{ item.value.failovermethod | default(omit) }}"
+    file: "{{ item.value.file | default(omit) }}"
+    gpgcakey: "{{ item.value.gpgcakey | default(omit) }}"
+    gpgcheck: "{{ item.value.gpgcheck | default(omit) }}"
+    gpgkey: "{{ item.value.gpgkey | default(omit) }}"
+    group: "{{ item.value.group | default(omit) }}"
+    http_caching: "{{ item.value.http_caching | default(omit) }}"
+    include: "{{ item.value.include | default(omit) }}"
+    includepkgs: "{{ item.value.includepkgs | default(omit) }}"
+    ip_resolve: "{{ item.value.ip_resolve | default(omit) }}"
+    keepalive: "{{ item.value.keepalive | default(omit) }}"
+    keepcache: "{{ item.value.keepcache | default(omit) }}"
+    metadata_expire: "{{ item.value.metadata_expire | default(omit) }}"
+    metadata_expire_filter: "{{ item.value.metadata_expire_filter | default(omit) }}"
+    metalink: "{{ item.value.metalink | default(omit) }}"
+    mirrorlist: "{{ item.value.mirrorlist | default(omit) }}"
+    mirrorlist_expire: "{{ item.value.mirrorlist_expire | default(omit) }}"
+    mode: "{{ item.value.mode | default(omit) }}"
+    name: "{{ item.key }}"
+    owner: "{{ item.value.owner | default(omit) }}"
+    password: "{{ item.value.password | default(omit) }}"
+    priority: "{{ item.value.priority | default(omit) }}"
+    protect: "{{ item.value.protect | default(omit) }}"
+    proxy: "{{ item.value.proxy | default(omit) }}"
+    proxy_password: "{{ item.value.proxy_password | default(omit) }}"
+    proxy_username: "{{ item.value.proxy_username | default(omit) }}"
+    repo_gpgcheck: "{{ item.value.repo_gpgcheck | default(omit) }}"
+    reposdir: "{{ item.value.reposdir | default(omit) }}"
+    retries: "{{ item.value.retries | default(omit) }}"
+    s3_enabled: "{{ item.value.s3_enabled | default(omit) }}"
+    selevel: "{{ item.value.selevel | default(omit) }}"
+    serole: "{{ item.value.serole | default(omit) }}"
+    setype: "{{ item.value.setype | default(omit) }}"
+    seuser: "{{ item.value.seuser | default(omit) }}"
+    skip_if_unavailable: "{{ item.value.skip_if_unavailable | default(omit) }}"
+    ssl_check_cert_permissions: "{{ item.value.ssl_check_cert_permissions | default(omit) }}"
+    sslcacert: "{{ item.value.sslcacert | default(omit) }}"
+    sslclientcert: "{{ item.value.sslclientcert | default(omit) }}"
+    sslclientkey: "{{ item.value.sslclientkey | default(omit) }}"
+    sslverify: "{{ item.value.sslverify | default(omit) }}"
+    state: "{{ item.value.state | default(omit) }}"
+    throttle: "{{ item.value.throttle | default(omit) }}"
+    timeout: "{{ item.value.timeout | default(omit) }}"
+    ui_repoid_vars: "{{ item.value.ui_repoid_vars | default(omit) }}"
+    unsafe_writes: "{{ item.value.unsafe_writes | default(omit) }}"
+    username: "{{ item.value.username | default(omit) }}"
+  with_dict: "{{ redhat_repo }}"
+  register: register_yum_command
+  retries: 3
+  delay: 10
+  until: not register_yum_command['failed']
+  when: ansible_os_family == 'RedHat'
