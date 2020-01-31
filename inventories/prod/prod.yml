@@ -1,0 +1,15 @@
+---
+all:
+  hosts:
+    ns1.trombik.org:
+      ansible_host: ns.trombik.org
+  children:
+    ns:
+      hosts:
+        ns.trombik.org:
+    prod_credentials:
+      children:
+        ns:
+    prod:
+      children:
+        ns:
