@@ -1,5 +1,15 @@
 ---
 
+# ____________________________________________________pf
+pf_rule: |
+  set skip on lo
+  block return    # block stateless traffic
+
+  pass in  quick proto icmp
+  pass in  quick proto tcp from any to any port ssh
+  pass in  quick proto { tcp, udp } from any to any port domain
+  pass out quick from any to any
+
 # ____________________________________________________nsd
 nsd_flags: ""
 nsd_zones: "{{ project_nsd_zones }}"
