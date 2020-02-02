@@ -24,10 +24,14 @@ vip = case ENV["ANSIBLE_ENVIRONMENT"]
         raise "unknown ANSIBLE_ENVIRONMENT"
       end
 
+# XXX use YAML
 domains = [
   {
     name: "trombik.org",
     ns: %w[a.ns.trombik.org b.ns.trombik.org],
+    mx: [
+      { name: "mx.trombik.org", address: vip, prio: 50 }
+    ],
     a: [
       { name: "www", address: vip }
     ],
@@ -36,6 +40,7 @@ domains = [
   {
     name: "mkrsgh.org",
     ns: %w[a.ns.mkrsgh.org b.ns.mkrsgh.org],
+    mx: [],
     a: [
       { name: "rep", address: vip }
     ],
@@ -63,14 +68,26 @@ context "after provision finishes" do
       end
     end
   end
+
   domains.each do |domain|
     describe command("#{dig_command} @127.0.0.1 ns #{domain[:name]}. +norec") do
       its(:exit_status) { should eq 0 }
+      its(:stderr) { should eq "" }
       its(:stdout) { should match(/^;; flags: qr aa; QUERY: 1, ANSWER: #{domain[:ns].length}, AUTHORITY: 0, ADDITIONAL: #{domain[:ns].length}$/) }
       domain[:ns].each do |ns|
         its(:stdout) { should match(/^#{ns}.\s+\d+\s+IN\s+A\s+\d+/) }
       end
+    end
+
+    describe command("#{dig_command} @127.0.0.1 mx #{domain[:name]}. +norec") do
+      its(:exit_status) { should eq 0 }
       its(:stderr) { should eq "" }
+      unless domain[:mx].empty?
+        its(:stdout) { should match(/^;; flags: qr aa; QUERY: 1, ANSWER: #{domain[:mx].length}, AUTHORITY: #{domain[:ns].length}, ADDITIONAL: #{domain[:mx].length + domain[:ns].length}$/) }
+        domain[:mx].each do |mx|
+          its(:stdout) { should match(/^#{domain[:name]}.\s+\d+\s+IN\s+MX\s+#{mx[:prio]}\s+#{mx[:name]}\./) }
+        end
+      end
     end
   end
 
