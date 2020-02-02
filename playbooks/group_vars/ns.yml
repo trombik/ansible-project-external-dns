@@ -8,6 +8,7 @@ pf_rule: |
   pass in  quick proto icmp
   pass in  quick proto tcp from any to any port ssh
   pass in  quick proto { tcp, udp } from any to any port domain
+  pass in  quick proto tcp from any to any port { http, https }
   pass out quick from any to any
 
 # ____________________________________________________nsd
