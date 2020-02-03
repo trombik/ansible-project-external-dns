@@ -38,6 +38,10 @@ domains = [
     cname: [
       { name: "cdn", address: "cdn.example.org" }
     ],
+    txt: [
+      { name: "", addresses: %w[foo bar] },
+      { name: "txt", addresses: %w[buz] }
+    ],
     vip: vip
   },
   {
@@ -48,6 +52,7 @@ domains = [
       { name: "rep", address: vip }
     ],
     cname: [],
+    txt: [],
     vip: vip
   }
 ]
@@ -99,6 +104,16 @@ context "after provision finishes" do
         its(:exit_status) { should eq 0 }
         its(:stderr) { should eq "" }
         its(:stdout) { should match(/^#{Regexp.escape(cname[:name])}\.#{domain[:name]}\.\s+\d+\s+IN\s+CNAME\s+#{Regexp.escape(cname[:address])}\.$/) }
+      end
+    end
+
+    domain[:txt].each do |txt|
+      describe command("#{dig_command} @127.0.0.1 txt #{txt[:name].empty? ? '' : txt[:name] + '.'}#{domain[:name]}. +norec") do
+        its(:exit_status) { should eq 0 }
+        its(:stderr) { should eq "" }
+        txt[:addresses].each do |address|
+          its(:stdout) { should match(/^#{Regexp.escape(txt[:name].empty? ? "" : txt[:name] + ".")}#{domain[:name]}\.\s+\d+\s+IN\s+TXT\s+"#{Regexp.escape(address)}"$/) }
+        end
       end
     end
   end
