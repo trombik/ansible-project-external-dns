@@ -35,6 +35,9 @@ domains = [
     a: [
       { name: "www", address: vip }
     ],
+    cname: [
+      { name: "cdn", address: "cdn.example.org" }
+    ],
     vip: vip
   },
   {
@@ -44,6 +47,7 @@ domains = [
     a: [
       { name: "rep", address: vip }
     ],
+    cname: [],
     vip: vip
   }
 ]
@@ -87,6 +91,14 @@ context "after provision finishes" do
         domain[:mx].each do |mx|
           its(:stdout) { should match(/^#{domain[:name]}.\s+\d+\s+IN\s+MX\s+#{mx[:prio]}\s+#{mx[:name]}\./) }
         end
+      end
+    end
+
+    domain[:cname].each do |cname|
+      describe command("#{dig_command} @127.0.0.1 cname #{cname[:name]}.#{domain[:name]}. +norec") do
+        its(:exit_status) { should eq 0 }
+        its(:stderr) { should eq "" }
+        its(:stdout) { should match(/^#{Regexp.escape(cname[:name])}\.#{domain[:name]}\.\s+\d+\s+IN\s+CNAME\s+#{Regexp.escape(cname[:address])}\.$/) }
       end
     end
   end
