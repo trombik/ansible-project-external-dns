@@ -65,13 +65,13 @@ context "after provision finishes" do
       it { should be_owned_by "root" }
       it { should be_grouped_into nsd_user }
       it { should be_mode 640 }
-      its(:content) { should match(/^#{domain[:name]}\. IN SOA a.ns.#{domain[:name]}. hostmaster.#{domain[:name]}. 2013020201 10800 3600 604800 3600$/) }
+      its(:content) { should match(/^#{domain[:name]}\.\s+\d+\s+IN SOA a.ns.#{domain[:name]}. hostmaster.#{domain[:name]}. \d+ \d+ \d+ \d+ \d+$/) }
       its(:content) { should match(/^;; Managed by ansible$/) }
       its(:content) { should match(/\$TTL 86400$/) }
-      its(:content) { should match(/^#{domain[:name]}.\s+IN\s+NS a.ns$/) }
-      its(:content) { should match(/^#{domain[:name]}.\s+IN\s+NS b.ns$/) }
-      its(:content) { should match(/^a.ns\s+IN\s+A\s+#{domain[:vip]}$/) }
-      its(:content) { should match(/^b.ns\s+IN\s+A\s+#{domain[:vip]}$/) }
+      its(:content) { should match(/^#{domain[:name]}.\s+\d+\s+IN\s+NS a.ns$/) }
+      its(:content) { should match(/^#{domain[:name]}.\s+\d+\s+IN\s+NS b.ns$/) }
+      its(:content) { should match(/^a.ns\s+\d+\s+IN\s+A\s+#{domain[:vip]}$/) }
+      its(:content) { should match(/^b.ns\s+\d+\s+IN\s+A\s+#{domain[:vip]}$/) }
       domain[:a].each do |a|
         its(:content) { should match(/^#{a[:name]}\s+IN\s+A\s+#{a[:address]}$/) }
       end
