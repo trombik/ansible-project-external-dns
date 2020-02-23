@@ -12,4 +12,3 @@
 - name: trombik.pf
 - name: trombik.x509_certificate
 - name: trombik.nsd
-  version: master
