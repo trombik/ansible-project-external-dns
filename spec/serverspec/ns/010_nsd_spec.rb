@@ -19,7 +19,7 @@ vip = case ENV["ANSIBLE_ENVIRONMENT"]
       when "virtualbox"
         "172.16.100.200"
       when "prod"
-        "CHANGEME"
+        "52.193.151.1"
       else
         raise "unknown ANSIBLE_ENVIRONMENT"
       end
