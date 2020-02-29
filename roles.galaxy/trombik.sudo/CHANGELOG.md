@@ -1,3 +1,7 @@
+## Release 1.0.4
+
+* 996acf6 build(deps): bump nokogiri from 1.10.7 to 1.10.8
+
 ## Release 1.0.3
 
 * 81941b5 bugfix: QA
