@@ -33,10 +33,10 @@ domains = [
       { name: "mx.trombik.org", address: vip, prio: 50 }
     ],
     a: [
-      { name: "www", address: vip }
+      { name: "www", addresses: [vip] }
     ],
     cname: [
-      { name: "cdn", address: "cdn.example.org" }
+      { name: "cdn", addresses: ["cdn.example.org"] }
     ],
     txt: [
       { name: "", addresses: %w[foo bar] },
@@ -49,7 +49,7 @@ domains = [
     ns: %w[a.ns.mkrsgh.org b.ns.mkrsgh.org],
     mx: [],
     a: [
-      { name: "rep", address: vip }
+      { name: "rep", addresses: [vip] }
     ],
     cname: [],
     txt: [],
@@ -73,7 +73,9 @@ context "after provision finishes" do
       its(:content) { should match(/^a.ns\s+\d+\s+IN\s+A\s+#{domain[:vip]}$/) }
       its(:content) { should match(/^b.ns\s+\d+\s+IN\s+A\s+#{domain[:vip]}$/) }
       domain[:a].each do |a|
-        its(:content) { should match(/^#{a[:name]}\s+IN\s+A\s+#{a[:address]}$/) }
+        a[:addresses].each do |addr|
+          its(:content) { should match(/^#{a[:name]}\s+IN\s+A\s+#{addr}$/) }
+        end
       end
     end
   end
@@ -103,7 +105,9 @@ context "after provision finishes" do
       describe command("#{dig_command} @127.0.0.1 cname #{cname[:name]}.#{domain[:name]}. +norec") do
         its(:exit_status) { should eq 0 }
         its(:stderr) { should eq "" }
-        its(:stdout) { should match(/^#{Regexp.escape(cname[:name])}\.#{domain[:name]}\.\s+\d+\s+IN\s+CNAME\s+#{Regexp.escape(cname[:address])}\.$/) }
+        cname[:addresses].each do |addr|
+          its(:stdout) { should match(/^#{Regexp.escape(cname[:name])}\.#{domain[:name]}\.\s+\d+\s+IN\s+CNAME\s+#{Regexp.escape(addr)}\.$/) }
+        end
       end
     end
 
